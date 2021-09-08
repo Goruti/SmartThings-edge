@@ -1,0 +1,6 @@
+/esp32_lux/driver/lua_libs-api_v0/
+/esp32_lux/driver/docs/
+/esp32_lux/app/nodemcu-dev-esp32-11-modules-2021-08-25-17-13-32-float.bin
+.DS_Store
+esp32_lux/.DS_Store
+/.idea/
