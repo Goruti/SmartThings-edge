@@ -146,6 +146,10 @@ function server_start()
                     wifi_sta_start(r.body.ssid, r.body.pwd)
                     conn:send(res.error("200", res.REDIRECT_VIEW))
                 end
+            else
+                conn:send(
+                        res.error("404", res.NOT_FOUND)
+                )
             end -- end POST routing PATHS
 
         elseif r.method == "GET" then
@@ -199,8 +203,11 @@ function server_start()
                 -- WIFI CONFIGURATION
             elseif r.uri.path == "/" then
                 print("ROOT PATH")
-                wifi.mode(wifi.STATIONAP)
-                node.sleep({ secs = 2 })
+                if wifi.getmode() == wifi.SOFTAP then
+                    wifi.mode(wifi.STATIONAP)
+                    node.sleep({ secs = 2 })
+                end
+
                 wifi.sta.scan({}, function(err, arr)
                     if err then
                         print ("Scan failed:", err)
@@ -213,6 +220,10 @@ function server_start()
                         )
                     end
                 end)
+            else
+                conn:send(
+                        res.error("404", res.NOT_FOUND)
+                )
             end   -- end GET routing PATHS
         else  -- else Method routing
             res.error("405", res.METHOD_NOT_ALLOWED)

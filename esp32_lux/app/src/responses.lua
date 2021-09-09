@@ -112,6 +112,7 @@ content="width=device-width, initial-scale=1">
 
 res_handler.INTERNAL_ERROR = "Internal Server Error"
 res_handler.METHOD_NOT_ALLOWED = "Method Not Allowed"
+res_handler.NOT_FOUND = "Page or File Not Found "
 
 res_handler.WIFI_ERROR =
 [[<!DOCTYPE html><html>
