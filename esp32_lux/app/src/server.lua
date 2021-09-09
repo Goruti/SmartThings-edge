@@ -137,13 +137,14 @@ function server_start()
             if r.uri.path:find('/config_wifi') then
                 r.body = r.getBody()
                 if r.body.ssid and r.body.pwd then
-                    if pcall(wifi_sta_start(r.body.ssid, r.body.pwd)) then
-                        conn:send(res.error("200", res.REDIRECT_VIEW))
-                    else
-                        conn:send(res.error("500", res.INTERNAL_ERROR))
-                    end
-                    --wifi_sta_start(r.body.ssid, r.body.pwd)
+                    --if pcall(wifi_sta_start(r.body.ssid, r.body.pwd)) then
+                    --    conn:send(res.error("200", res.REDIRECT_VIEW))
+                    --else
+                    --    conn:send(res.error("500", res.INTERNAL_ERROR))
+                    --end
                     print("going to set up wifi with ssid", r.body.ssid, "and pwd: ", r.body.pwd)
+                    wifi_sta_start(r.body.ssid, r.body.pwd)
+                    conn:send(res.error("200", res.REDIRECT_VIEW))
                 end
             end -- end POST routing PATHS
 
@@ -155,9 +156,9 @@ function server_start()
             if r.uri.path:find(DEV.NAME..'.xml') then
                 return conn:send(res.error("200", res.DEVICE_INFO_XML))
 
-            -- Resource that will allow to
-            -- register a parent node (Hub)
-            -- storing its address and port.
+                -- Resource that will allow to
+                -- register a parent node (Hub)
+                -- storing its address and port.
             elseif r.uri.path:find('/ping') then
                 if r.args.ip and r.args.port then
                     DEV.HUB.addr = r.args.ip
@@ -170,16 +171,16 @@ function server_start()
                     return conn:send(res.error("200"))
                 end
 
-            -- Resource that will allow
-            -- device state poll retrieving
-            -- the raw state at the DEV.cache
-            -- table JSON formatted.
+                -- Resource that will allow
+                -- device state poll retrieving
+                -- the raw state at the DEV.cache
+                -- table JSON formatted.
             elseif r.uri.path:find('/refresh') then
                 return conn:send(res.error("200", DEV.cache))
 
-            -- Resource that allows to
-            -- unlink the registered
-            -- parent node (Hub)
+                -- Resource that allows to
+                -- unlink the registered
+                -- parent node (Hub)
             elseif r.uri.path:find('/delete') then
                 print('HUB REVOKED')
                 DEV.HUB.addr = nil
@@ -187,16 +188,16 @@ function server_start()
                 DEV.HUB.ext_uuid = nil
                 return conn:send(res.error("200"))
 
-            -- Resource that allows device
-            -- control either at the ST App
-            -- or at browsers
+                -- Resource that allows device
+                -- control either at the ST App
+                -- or at browsers
             elseif r.uri.path:find('/control') then
                 -- For future implementations
                 return conn:send(res.error("200"))
 
-            -- Resource that allows
-            -- WIFI CONFIGURATION
-            else
+                -- Resource that allows
+                -- WIFI CONFIGURATION
+            elseif r.uri.path == "/" then
                 print("ROOT PATH")
                 wifi.mode(wifi.STATIONAP)
                 node.sleep({ secs = 2 })
