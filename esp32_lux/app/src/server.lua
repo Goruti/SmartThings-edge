@@ -89,7 +89,7 @@ local function httpparse(request)
     local r = {}
     local _, i, raw_uri
     _, i, r.method, raw_uri = line:find("^([A-Z]+) (.-) HTTP/[1-9]+.[0-9]+$")
-    if not (r.method) then
+    if r.method ~= "POST" and r.method ~= "GET" then
         print("invalid request: ")
         return nil
     end
@@ -145,10 +145,9 @@ function server_start()
                     --wifi_sta_start(r.body.ssid, r.body.pwd)
                     print("going to set up wifi with ssid", r.body.ssid, "and pwd: ", r.body.pwd)
                 end
-            end -- end /config_wifi routing
+            end -- end POST routing PATHS
 
         elseif r.method == "GET" then
-
             -- Resource that provides the
             -- metadata of the device.
             -- This resource is provided
@@ -194,16 +193,18 @@ function server_start()
             elseif r.uri.path:find('/control') then
                 -- For future implementations
                 return conn:send(res.error("200"))
-                end
 
             -- Resource that allows
             -- WIFI CONFIGURATION
-            elseif r.uri.path:find('/') then
+            else
+                print("ROOT PATH")
+                wifi.mode(wifi.STATIONAP)
+                node.sleep({ secs = 2 })
                 wifi.sta.scan({}, function(err, arr)
                     if err then
                         print ("Scan failed:", err)
                         conn:send(
-                                res.error("200", res.WIFI_ERROR)
+                                res.error("500", res.WIFI_ERROR)
                         )
                     else
                         conn:send(
@@ -211,7 +212,8 @@ function server_start()
                         )
                     end
                 end)
-        else
+            end   -- end GET routing PATHS
+        else  -- else Method routing
             res.error("405", res.METHOD_NOT_ALLOWED)
         end -- end Method routing
         r = nil

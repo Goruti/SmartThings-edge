@@ -5,7 +5,6 @@ function wifi_sta_start(ssid, pwd)
         pwd=pwd,
         auto=true
     }
-    wifi.mode(wifi.STATIONAP, true)
     wifi.sta.config(wifi_config, true)
     print('connecting to wifi...')
 end
@@ -57,8 +56,10 @@ wifi.sta.on(
             WIFI_DIS_COUNT = WIFI_DIS_COUNT + 1
             if WIFI_DIS_COUNT >= 5 then
                 print("Disable Station Configuration")
+                wifi.sta.config({ssid="", pwd="", auto=false}, true)
                 wifi.mode(wifi.SOFTAP, true)
                 wifi.ap.config(WIFI_AP_CONFIG)
+                WIFI_DIS_COUNT = 0
             end
         end)
 
