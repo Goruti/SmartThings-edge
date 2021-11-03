@@ -21,7 +21,7 @@ local TSL2561_Channel0H = 0x8D
 local TSL2561_Channel1L = 0x8E
 local TSL2561_Channel1H = 0x8F
 
-local TSL2561_Address = 0x29   -- device address
+local TSL2561_Address = 0x39   -- device address
 
 local LUX_SCALE     = 14       -- scale by 2^14
 local RATIO_SCALE   = 9        -- scale ratio by 2^9
@@ -86,7 +86,7 @@ local M = {}
 _G[moduleName] = M
 
 -- i2c interface ID
-local id = 0
+local id = i2c.SW
 
 -- local vars
 local ch0,ch1,chScale,channel1,channel0,ratio1,b,m,temp,lux = 0
@@ -108,7 +108,7 @@ end
 
 function Wire.requestFrom(ADDR, length)
     i2c.start(id)
-    i2c.address(id, ADDR,i2c.RECEIVER)
+    i2c.address(id, ADDR, i2c.RECEIVER)
     c = i2c.read(id, length)
     i2c.stop(id)
     return string.byte(c)
@@ -135,6 +135,10 @@ function M.getLux()
     --read two bytes from registers 0x0E and 0x0F
     local CH1_LOW=readRegister(TSL2561_Address,TSL2561_Channel1L)
     local CH1_HIGH=readRegister(TSL2561_Address,TSL2561_Channel1H)
+    print("CH0_LOW", CH0_LOW)
+    print("CH0_HIGH", CH0_HIGH)
+    print("CH1_LOW", CH1_LOW)
+    print("CH1_HIGH", CH1_HIGH)
 
     ch0 = bit.bor(bit.lshift(CH0_HIGH,8),CH0_LOW)
     ch1 = bit.bor(bit.lshift(CH1_HIGH,8),CH1_LOW)
@@ -143,17 +147,18 @@ end
 function M.init(sda, scl)
     i2c.setup(id, sda, scl, i2c.SLOW)
     writeRegister(TSL2561_Address,TSL2561_Control,0x03)  -- POWER UP
-    writeRegister(TSL2561_Address,TSL2561_Timing,0x00)  --No High Gain (1x), integration time of 13ms
-    writeRegister(TSL2561_Address,TSL2561_Interrupt,0x00)
-    writeRegister(TSL2561_Address,TSL2561_Control,0x00)  -- POWER Down
+    --writeRegister(TSL2561_Address,TSL2561_Timing,0x00)  --No High Gain (1x), integration time of 13ms
+    writeRegister(TSL2561_Address,TSL2561_Timing,0x02)  --No High Gain (1x), integration time of 402ms
+    --writeRegister(TSL2561_Address,TSL2561_Interrupt,0x00)
+    --writeRegister(TSL2561_Address,TSL2561_Control,0x00)  -- POWER Down
 end
 
 function M.readVisibleLux()
     writeRegister(TSL2561_Address,TSL2561_Control,0x03)  -- POWER UP
-    tmr.delay(14000)
+    node.sleep({ secs = 2 })
     M.getLux()
 
-    writeRegister(TSL2561_Address,TSL2561_Control,0x00)  -- POWER Down
+    --writeRegister(TSL2561_Address,TSL2561_Control,0x00)  -- POWER Down
     if(ch0/ch1 < 2 and ch0 > 4900) then
         return -1  -- ch0 out of range, but ch1 not. the lux is not valid in this situation.
     end

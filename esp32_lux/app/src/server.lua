@@ -142,7 +142,7 @@ function server_start()
                     --else
                     --    conn:send(res.error("500", res.INTERNAL_ERROR))
                     --end
-                    print("going to set up wifi with ssid", r.body.ssid, "and pwd: ", r.body.pwd)
+                    --print("going to set up wifi with ssid", r.body.ssid, "and pwd: ", r.body.pwd)
                     wifi_sta_start(r.body.ssid, r.body.pwd)
                     conn:send(res.error("200", res.REDIRECT_VIEW))
                 end

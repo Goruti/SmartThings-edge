@@ -20,7 +20,7 @@ function upnp_start()
         'SERVER: NodeMCU/Lua5.1.4 UPnP/1.1 '..DEV.NAME..'/0.1',
         'ST: upnp:rootdevice',
         'USN: uuid:'..DEV.CHIP_ID..'-'..DEV.SN,
-        'Location: http://'..wifi.sta.getip()..':80/'..DEV.NAME..'.xml'
+        'Location: http://'..DEV.IP_ADDR..':80/'..DEV.NAME..'.xml'
     }, '\r\n')
 
     -- Listen on-demand M-SEARCH streams.

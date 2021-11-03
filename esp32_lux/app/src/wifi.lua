@@ -61,6 +61,8 @@ wifi.sta.on(
                 wifi.ap.config(WIFI_AP_CONFIG)
                 WIFI_DIS_COUNT = 0
             end
+            --Turn Off WIFI LED
+            gpio.write(BLUE_LED, 0)
         end)
 
 -- STATION IP Ready
@@ -69,6 +71,7 @@ wifi.sta.on(
         function(evt, info)
             print("Disable AP")
             wifi.mode(wifi.STATION, true)
+            DEV.IP_ADDR=info.ip
             print(
                     'service: station\r\n'..
                     'status: ip ready\r\n'..
@@ -79,6 +82,8 @@ wifi.sta.on(
             if wifi.getmode() ~= wifi.STATION then
                 wifi.mode(wifi.STATION, true)
             end
+            --Turn ON WIFI LED
+            gpio.write(BLUE_LED, 1)
             -- initialize ssdp session
             --upnp_start()
         end)
